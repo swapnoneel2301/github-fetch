@@ -7,8 +7,71 @@ function App() {
   const toast = useToast();
   const [userName, setUserName] = useState("");
   const [userDetails, setUserDetails] = useState(null);
+  const [repoList, setRepoList] = useState(null);
+  const [followerList, setFollowerList] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const fetchRepoList = async () => {
+    try {
+      let resp = await fetch(`${base_url}/${userName}/repos`);
+      let data = await resp.json();
+      if (data.message) {
+        toast({
+          title: "Repositories Not Found",
+          status: "error",
+          duration: 4000,
+          position: "top-right",
+          isClosable: true,
+        });
+        // setRepoList(null);
+        return null;
+      } else {
+        // setRepoList(data);
+        return data;
+      }
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "Not able to fetch Repositories",
+        status: "error",
+        duration: 4000,
+        position: "top-right",
+        isClosable: true,
+      });
+      return null;
+    }
+  };
+
+  const fetchFollowerList = async () => {
+    try {
+      let resp = await fetch(`${base_url}/${userName}/followers`);
+      let data = await resp.json();
+      if (data.message) {
+        toast({
+          title: "Followers Not Found",
+          status: "error",
+          duration: 4000,
+          position: "top-right",
+          isClosable: true,
+        });
+        // setFollowerList(null);
+        return null;
+      } else {
+        // setFollowerList(data);
+        return data;
+      }
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "Not able to fetch Followers",
+        status: "error",
+        duration: 4000,
+        position: "top-right",
+        isClosable: true,
+      });
+      return null;
+    }
+  };
   const fetchDetails = async () => {
     setLoading(true);
     try {
@@ -17,6 +80,8 @@ function App() {
       console.log(data);
       if (data.message) {
         setUserDetails(null);
+        setRepoList(null);
+        setFollowerList(null);
         toast({
           title: "Username Not Found",
           status: "error",
@@ -25,7 +90,11 @@ function App() {
           isClosable: true,
         });
       } else {
-        setUserDetails(data);
+        // fetch repo list
+        const localRespList = await fetchRepoList();
+
+        // fetch folower list
+        const localFollowerList = await fetchFollowerList();
         toast({
           title: `Found @${userName}`,
           status: "success",
@@ -33,6 +102,9 @@ function App() {
           position: "top-right",
           isClosable: true,
         });
+        setUserDetails(data);
+        setRepoList(localRespList);
+        setFollowerList(localFollowerList);
       }
       setLoading(false);
     } catch (err) {
@@ -56,27 +128,23 @@ function App() {
       justifyContent="flex-start"
       flexDirection="column"
     >
-      <Input
-        variant="filled"
-        placeholder="Enter Github Username"
-        size="lg"
-        w="40vw"
-        m="5"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-        onKeyDown={(e) => {
-          e.key === "Enter" && fetchDetails();
-        }}
-      />
-      <Button
-        colorScheme="green"
-        size="lg"
-        onClick={fetchDetails}
-        isLoading={loading}
-      >
-        Search
-      </Button>
-      <UserDetails {...{ userDetails }} />
+      <Flex alignItems="center">
+        <Input
+          variant="filled"
+          placeholder="Enter Github Username"
+          w="40vw"
+          m="5"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+          onKeyDown={(e) => {
+            e.key === "Enter" && fetchDetails();
+          }}
+        />
+        <Button colorScheme="green" onClick={fetchDetails} isLoading={loading}>
+          Search
+        </Button>
+      </Flex>
+      <UserDetails {...{ userDetails, repoList, followerList }} />
     </Flex>
   );
 }

@@ -12,8 +12,10 @@ import {
   TabPanel,
 } from "@chakra-ui/react";
 import React from "react";
+import RepoList from "./RepoList";
+import FollowerList from "./FollowerList";
 
-const UserDetails = ({ userDetails }) => {
+const UserDetails = ({ userDetails, repoList, followerList }) => {
   const { name, login, avatar_url, bio } = userDetails ? userDetails : {};
 
   return userDetails ? (
@@ -21,18 +23,20 @@ const UserDetails = ({ userDetails }) => {
       w="100%"
       bg="white"
       h="100%"
-      m="5"
-      px="5"
-      templateColumns="1fr 2fr"
+      m="1"
+      px="2"
+      templateColumns="1fr 3fr"
       gap=""
     >
       <GridItem
         display="flex"
         flexDirection="column"
-        justifyContent="center"
+        justifyContent="flex-start"
         alignItems="center"
         bg="gray.200"
         borderLeftRadius="lg"
+        pt="20"
+        ml="5"
       >
         {avatar_url ? (
           <Avatar name={name} size="2xl" src={avatar_url} />
@@ -65,13 +69,10 @@ const UserDetails = ({ userDetails }) => {
 
           <TabPanels>
             <TabPanel>
-              <p>one!</p>
+              <RepoList {...{ repoList }} />
             </TabPanel>
             <TabPanel>
-              <p>two!</p>
-            </TabPanel>
-            <TabPanel>
-              <p>three!</p>
+              <FollowerList {...{ followerList }} />
             </TabPanel>
           </TabPanels>
         </Tabs>
