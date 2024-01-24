@@ -141,7 +141,7 @@ function App() {
           }}
         />
         <Button colorScheme="green" onClick={fetchDetails} isLoading={loading}>
-          Search
+          Find
         </Button>
       </Flex>
       <UserDetails {...{ userDetails, repoList, followerList }} />
